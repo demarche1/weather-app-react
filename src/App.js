@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { cityWeather } from './api/fetchWeather'
+import { useState, useEffect } from 'react'
+import { cityWeather, coordsWeather } from './api/fetchWeather'
 
 function App() {
    const [city, setCity] = useState(null)
@@ -15,6 +15,22 @@ function App() {
          alert('Você deve informar uma cidade válida')
       }
    }
+
+   const getCoodsData = async (lat, long) => {
+      try {
+         const data = await coordsWeather(lat, long)
+         setWeather(data)
+         console.log(weather);
+      } catch (error) {
+         console.error(error.message)
+      }
+   }
+
+   useEffect(() => {
+      navigator.geolocation.getCurrentPosition((p) => {
+         getCoodsData(p.coords.latitude, p.coords.longitude)
+      })
+   }, [])
 
    return (
       <>
@@ -44,7 +60,7 @@ function App() {
                      <li className='ml-2 mb-2 inline'>
                         Minima: <span className='ml-2 text-yellow-500'>{Math.round(weather != null ? weather.main.temp_min : '')}°C</span>
                      </li>
-                     <li className='mb-2'>
+                     <li className='mb-2 mt-2'>
                         Pressão: <span className='text-yellow-500'>{weather != null ? weather.main.pressure : ''}</span>
                      </li>
                      <li className=''>
